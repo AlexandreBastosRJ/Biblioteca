@@ -10,6 +10,7 @@ builder.Services.AddScoped<IAssuntoNeg, AssuntoNeg>();
 builder.Services.AddScoped<IAutorNeg, AutorNeg>();
 builder.Services.AddScoped<IFormaPgtoNeg, FormaPgtoNeg>();
 builder.Services.AddScoped<ILivroFormaPgtoNeg, LivroFormaPgtoNeg>();
+builder.Configuration.AddUserSecrets<Program>();
 
 
 
