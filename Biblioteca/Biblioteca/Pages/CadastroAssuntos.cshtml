@@ -1,0 +1,156 @@
+﻿@page
+@model Biblioteca.Pages.CadastroAssuntosModel
+@{
+    ViewData["Title"] = "Cadastro de Assuntos";
+}
+
+
+<script>
+       function abrirModal(id, descricao) {
+        document.getElementById("AssuntoId").value = id;
+        document.getElementById("DescricaoModal").value = descricao;
+
+        var modal = new bootstrap.Modal(document.getElementById('modalEditar'));
+        modal.show();
+
+    }
+
+     function abrirModalExcluir(id, descricao) {
+        document.getElementById("AssuntoIdExcluir").value = id;
+        document.getElementById("descricaoExcluir").textContent = descricao;
+
+        var modal = new bootstrap.Modal(document.getElementById('modalExcluir'));
+        modal.show();
+    }
+
+</script>
+
+<div class="row align-items-center mb-4">
+    <div class="col-8">
+        <h2 class="titulo-pagina">Cadastro de Assuntos</h2>
+    </div>
+    <div class="col-4 text-end">
+        <a href="ListaLivros" class="btn btn-outline-primary btn-voltar">
+            <i class="fas fa-arrow-left"></i> <span class="d-none d-sm-inline">Voltar</span>
+        </a>
+    </div>
+</div>
+
+
+<form method="post">
+    <div>
+        <label for="descricao">Descrição:</label>
+        <input type="text" id="txtdescricao" asp-for="Assunto.Descricao" required />
+    </div>
+
+    <div>
+        <button id="btnSalvar" type="submit">Salvar</button>
+    </div>
+    @if (TempData["Mensagem"] != null)
+    {
+        <div class="alerta-sucesso">@TempData["Mensagem"]</div>
+        <script>
+            setTimeout(function () {
+                window.location.href = window.location.pathname;
+            }, 5000);
+        </script>
+    }
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Erro"]</div>
+
+        <script>
+            setTimeout(function () {
+                window.location.href = window.location.pathname;
+            }, 5000);
+        </script>
+    }
+
+    @if (Model.ListaAssuntos.Any())
+    {
+        <h3>Assuntos Cadastrados</h3>
+        <table class="tabela-grid">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Descrição</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var assunto in Model.ListaAssuntos)
+                {
+                    <tr>
+                        <td>@assunto.AssuntoId</td>
+                        <td>@assunto.Descricao</td>
+                        <td>
+                           
+                            <button type="button"
+                                    class="btn btn-sm btn-primary me-1"
+                                    onclick="abrirModal('@assunto.AssuntoId', '@assunto.Descricao')">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                            &nbsp;&nbsp;
+                            <button type="button"
+                                    class="btn btn-sm btn-danger"
+                                    onclick="abrirModalExcluir('@assunto.AssuntoId', '@assunto.Descricao')">
+                                <i class="bi bi-trash"></i> Excluir
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    }
+    else
+    {
+        <p>Nenhum assunto cadastrado ainda.</p>
+    }
+</form>
+
+<!-- Modal de Edição -->
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Editar">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarLabel">Editar Assunto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="AssuntoId" name="AssuntoId" />
+                    <div class="mb-3">
+                        <label for="DescricaoModal" class="form-label">Descrição</label>
+                        <input type="text" class="form-control" id="DescricaoModal" name="Descricao" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalExcluir" tabindex="-1" aria-labelledby="modalExcluirLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Excluir">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalExcluirLabel">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="AssuntoIdExcluir" name="AssuntoId" />
+                    <p>Tem certeza que deseja excluir o assunto <strong><span id="descricaoExcluir"></span></strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

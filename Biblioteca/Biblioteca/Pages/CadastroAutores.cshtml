@@ -1,0 +1,153 @@
+﻿@page
+@model Biblioteca.Pages.CadastroAutoresModel
+@{
+    ViewData["Title"] = "Cadastro de Autores";
+}
+
+<script>
+    function abrirModal(id, nome) {
+        document.getElementById("AutorId").value = id;
+        document.getElementById("NomeModal").value = nome;
+
+        var modal = new bootstrap.Modal(document.getElementById('modalEditar'));
+        modal.show();
+    }
+
+    function abrirModalExcluir(id, nome) {
+        document.getElementById("AutorIdExcluir").value = id;
+        document.getElementById("nomeExcluir").textContent = nome;
+
+        var modal = new bootstrap.Modal(document.getElementById('modalExcluir'));
+        modal.show();
+    }
+</script>
+
+
+<div class="row align-items-center mb-4">
+    <div class="col-8">
+        <h2 class="titulo-pagina">Cadastro de Autores</h2>
+    </div>
+    <div class="col-4 text-end">
+        <a href="ListaLivros" class="btn btn-outline-primary btn-voltar">
+            <i class="fas fa-arrow-left"></i> <span class="d-none d-sm-inline">Voltar</span>
+        </a>
+    </div>
+</div>
+
+<form method="post">
+    <div>
+        <label for="nome">Nome:</label>
+        <input type="text" id="txtnome" asp-for="Autor.Nome" required />
+    </div>
+
+    <div>
+        <button id="btnSalvar" type="submit">Salvar</button>
+    </div>
+
+    @if (TempData["Mensagem"] != null)
+    {
+        <div class="alerta-sucesso">@TempData["Mensagem"]</div>
+        <script>
+            setTimeout(function () {
+                window.location.href = window.location.pathname;
+            }, 5000);
+        </script>
+    }
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Erro"]</div>
+
+        <script>
+            setTimeout(function () {
+                window.location.href = window.location.pathname;
+            }, 5000);
+        </script>
+    }
+
+    @if (Model.ListaAutores.Any())
+    {
+        <h3>Autores Cadastrados</h3>
+        <table class="tabela-grid">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var autor in Model.ListaAutores)
+                {
+                    <tr>
+                        <td>@autor.AutorId</td>
+                        <td>@autor.Nome</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-primary me-1"
+                                    onclick="abrirModal('@autor.AutorId', '@autor.Nome')">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                            &nbsp;&nbsp;
+                            <button type="button"
+                                    class="btn btn-sm btn-danger"
+                                    onclick="abrirModalExcluir('@autor.AutorId', '@autor.Nome')">
+                                <i class="bi bi-trash"></i> Excluir
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>Nenhum autor cadastrado ainda.</p>
+    }
+</form>
+
+<!-- Modal de Edição -->
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Editar">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarLabel">Editar Autor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="AutorId" name="AutorId" />
+                    <div class="mb-3">
+                        <label for="NomeModal" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="NomeModal" name="Nome" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Exclusão -->
+<div class="modal fade" id="modalExcluir" tabindex="-1" aria-labelledby="modalExcluirLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Excluir">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalExcluirLabel">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="AutorIdExcluir" name="AutorId" />
+                    <p>Tem certeza que deseja excluir o autor <strong><span id="nomeExcluir"></span></strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

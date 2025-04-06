@@ -1,0 +1,198 @@
+﻿@page "{id?}"
+@model Biblioteca.Pages.CadastroLivroModel
+
+@{
+    ViewData["Title"] = "Cadastro de Livros";
+}
+<div class="row align-items-center mb-4">
+    <div class="col-8">
+        <h2 class="titulo-pagina">Cadastro de Livros</h2>
+    </div>
+    <div class="col-4 text-end">
+        <a href="ListaLivros" class="btn btn-outline-primary btn-voltar">
+            <i class="fas fa-arrow-left"></i> <span class="d-none d-sm-inline">Voltar</span>
+        </a>
+    </div>
+</div>
+
+
+
+<form method="post" id="formLivro">
+    <div>
+        <input type="hidden" asp-for="Livro.LivroId" />
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" asp-for="Livro.Titulo" required />
+    </div>
+
+    <div>
+        <label for="ano">Ano de Publicação:</label>
+        <input type="number" id="ano" asp-for="Livro.AnoPublicacao" required />
+    </div>
+
+    <div>
+        <label for="ano">Editora:</label>
+        <input type="text" id="editora" asp-for="Livro.Editora" required />
+    </div>
+
+    <div>
+        <label for="ano">Edição:</label>
+        <input type="number" id="edicao" asp-for="Livro.Edicao" required />
+    </div>
+
+    @if (Model.ListaLivroFormaPgto.Any())
+    {
+        <div class="Row">
+
+            <div class="col-8">
+                <label>Formas de Pagamento Cadastradas</label>
+            </div>
+           
+        </div>
+
+
+        <table class="table table-striped table-bordered align-middle mt-3">
+            <thead class="table-light">
+                <tr>
+                    <th>Forma de Pagamento</th>
+                    <th>Valor</th>
+                    <th class="text-nowrap">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var forma in Model.ListaLivroFormaPgto)
+                {
+                    <tr>
+                        <td>@forma.DescricaoFormaPgto</td>
+                        <td>R$ @forma.Valor_Livro_FormaVenda?.ToString("N2")</td>
+                        <td class="text-nowrap">
+                            <div class="d-flex flex-nowrap gap-1">
+                                <!-- Botão Excluir -->
+                                <a href="?handler=Excluir&id=@forma.Livro_Codl"
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Deseja excluir esta forma de pagamento?');"
+                                   title="Excluir">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    }
+    else
+    {
+       
+    }
+
+
+    <label>Autores</label>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <select id="autoresDisponiveis" size="5" style="width: 200px;" ondblclick="moverItem(this, 'autoresSelecionados')">
+            @foreach (var autor in Model.Autores)
+            {
+                <option value="@autor.Value">@autor.Text</option>
+            }
+        </select>
+
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+            <button type="button" onclick="moverSelecionado('autoresDisponiveis', 'autoresSelecionados')">→</button>
+            <button type="button" onclick="moverSelecionado('autoresSelecionados', 'autoresDisponiveis')">←</button>
+        </div>
+        <div class="list-column">
+
+            <select id="autoresSelecionados" name="Livro.AutoresIds" multiple size="5" style="width: 200px;">
+                @foreach (var autor in Model.AutoresCadastrados)
+                {
+                    <option value="@autor.Value">@autor.Text</option>
+
+                }
+            </select>
+        </div>
+
+    </div>
+
+    <label> Assuntos</label>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <select id="assuntosDisponiveis" size="5" style="width: 200px;" ondblclick="moverItem(this, 'assuntosSelecionados')">
+            @foreach (var assunto in Model.Assuntos)
+            {
+                <option value="@assunto.Value">@assunto.Text</option>
+            }
+        </select>
+
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+            <button type="button" onclick="moverSelecionado('assuntosDisponiveis', 'assuntosSelecionados')">→</button>
+            <button type="button" onclick="moverSelecionado('assuntosSelecionados', 'assuntosDisponiveis')">←</button>
+        </div>
+        <div class="list-column">
+
+            <select id="assuntosSelecionados" name="Livro.AssuntosIds" multiple size="5" style="width: 200px;">
+                @foreach (var assunto in Model.AssuntosCadastrados)
+                {
+                    <option value="@assunto.Value">@assunto.Text</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button type="submit">Salvar</button>
+    </div>
+</form>
+
+@if (Model.Livro?.LivroId > 0)
+{
+    <form method="post" asp-page-handler="Excluir" onsubmit="return confirm('Tem certeza que deseja excluir este livro?');">
+        <input type="hidden" name="LivroId" value="@Model.Livro.LivroId" />
+
+    </form>
+}
+
+@section Scripts {
+    <script>
+        function moverSelecionado(origemId, destinoId) {
+            const origem = document.getElementById(origemId);
+            const destino = document.getElementById(destinoId);
+            Array.from(origem.selectedOptions).forEach(option => {
+                destino.appendChild(option);
+            });
+        }
+
+        function moverItem(selectElement, destinoId) {
+            const destino = document.getElementById(destinoId);
+            if (selectElement.selectedIndex >= 0) {
+                const option = selectElement.options[selectElement.selectedIndex];
+                destino.appendChild(option);
+            }
+        }
+
+        // Ao submeter o formulário, garante que os itens selecionados estejam marcados
+        document.getElementById("formLivro").addEventListener("submit", function () {
+            document.querySelectorAll('#autoresSelecionados option, #assuntosSelecionados option')
+                .forEach(opt => opt.selected = true);
+        });
+
+             document.getElementById("formLivro").addEventListener("submit", function (e) {
+            const livroId = document.querySelector("input[name='Livro.LivroId']").value;
+
+            if (livroId) {
+                console.log("Edição");
+            } else {
+                console.log("Novo");
+            }
+        });
+
+             function abrirPopup() {
+                 alert('entrei');
+            document.getElementById("popupFormaPgto").style.display = "block";
+        }
+
+        function fecharPopup() {
+            document.getElementById("popupFormaPgto").style.display = "none";
+        }
+
+    </script>
+}
